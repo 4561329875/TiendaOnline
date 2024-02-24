@@ -62,4 +62,8 @@ public class Factura {
         this.estado = estado;
     }
 
+    public Factura(Pedido pedido) {
+        this.pedido = pedido;
+    }
+    
 }

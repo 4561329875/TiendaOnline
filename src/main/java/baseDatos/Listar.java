@@ -4,15 +4,16 @@
  */
 package baseDatos;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerApi;
-import com.mongodb.ServerApiVersion;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
+import java.util.ArrayList;
+import java.util.List;
 import org.bson.Document;
+import pedidos.Cliente;
+import pedidos.Pedido;
+import productos.Producto;
 
 /**
  *
@@ -20,38 +21,198 @@ import org.bson.Document;
  */
 public class Listar {
 
-    private MongoClient mongoClient = null;
-    private MongoCollection<Document> collecProdu = null;
-    private MongoCollection<Document> collecPedi = null;
-    private MongoCollection<Document> collecClient = null;
-    private MongoCollection<Document> collecFact = null;
-    private MongoCollection<Document> collecPag = null;
-    private MongoCollection<Document> collecEnvi = null;
+    private DB db;
 
-    public void iniciar() {
-        String connectionString = "mongodb+srv://fdtoro:WjykdQ47BQOqZoDm@cluster0.mgdhlmc.mongodb.net/?retryWrites=true&w=majority";
-        ServerApi serverApi = ServerApi.builder()
-                .version(ServerApiVersion.V1)
-                .build();
-        MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(connectionString))
-                .serverApi(serverApi)
-                .build();
+    public Producto[] obtenerProductos() {
+        MongoCollection<Document> collection = db.getCollecProdu();
+        List<Producto> lista = new ArrayList<Producto>();
 
-        MongoClient mongoClientTem = MongoClients.create(settings);
+        Producto[] pro = new Producto[1];
 
-        this.mongoClient = mongoClientTem;
-        MongoDatabase database = mongoClient.getDatabase("TiendaOnline");
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+                Producto indPro = new Producto();
+                indPro.setCodigo(document.getString("codigo"));
+                indPro.setNombre(document.getString("nombre"));
+                indPro.setDescripcion(document.getString("descripcion"));
+                indPro.setPrecio(document.getInteger("precio"));
+                indPro.setIva(document.getBoolean("iva"));
+                lista.add(indPro);
 
-        collecProdu=database.getCollection("Productos");
-        collecClient=database.getCollection("Clientes");
-        collecPedi=database.getCollection("Pedidos");
-        collecFact=database.getCollection("Facturas")
+            }
+        }
+        pro = lista.toArray(new Producto[0]);
+        return pro;
+    }
+
+    public Producto obtenerProductos(String a) {
+        MongoCollection<Document> collection = db.getCollecProdu();
+
+        Document query = new Document("codigo", a);
+        Document result = collection.find(query).first();
+
+        Document document = result;
+        Producto indPro = new Producto();
+        indPro.setCodigo(document.getString("codigo"));
+        indPro.setNombre(document.getString("nombre"));
+        indPro.setDescripcion(document.getString("descripcion"));
+        indPro.setPrecio(document.getInteger("precio"));
+        indPro.setIva(document.getBoolean("iva"));
+
+        return indPro;
+    }
+
+    public Producto[] obtenerProductos(String nombre, String descripcion, String codigo) {
+        MongoCollection<Document> collection = db.getCollecProdu();
+        List<Producto> lista = new ArrayList<Producto>();
+
+        Producto[] pro = null;
+        FindIterable<Document> result;
+        MongoCursor<Document> cursor = null;
+
+        if (nombre.equals("")) {
+            if (descripcion.equals("")) {
+                if (codigo.equals("")) {
+                    // Si todos los campos están vacíos, recuperar todos los documentos
+                    result = collection.find();
+                    cursor = result.cursor();
+                } else {
+                    // Si solo el campo 'codigo' tiene un valor
+                    result = collection.find(Filters.regex("codigo", codigo));
+                    cursor = result.cursor();
+                }
+            } else {
+                if (codigo.equals("")) {
+                    // Si solo el campo 'descripcion' tiene un valor
+                    result = collection.find(Filters.regex("descripcion", descripcion));
+                    cursor = result.cursor();
+                } else {
+                    // Si 'descripcion' y 'codigo' tienen valores
+                    result = collection.find(Filters.and(
+                            Filters.regex("descripcion", descripcion),
+                            Filters.regex("codigo", codigo)
+                    ));
+                    cursor = result.cursor();
+                }
+            }
+        } else {
+            if (descripcion.equals("")) {
+                if (codigo.equals("")) {
+                    // Si solo el campo 'nombre' tiene un valor
+                    result = collection.find(Filters.regex("nombre", nombre));
+                    cursor = result.cursor();
+                } else {
+                    // Si 'nombre' y 'codigo' tienen valores
+                    result = collection.find(Filters.and(
+                            Filters.regex("nombre", nombre),
+                            Filters.regex("codigo", codigo)
+                    ));
+                    cursor = result.cursor();
+                }
+            } else {
+                if (codigo.equals("")) {
+                    // Si 'nombre' y 'descripcion' tienen valores
+                    result = collection.find(Filters.and(
+                            Filters.regex("nombre", nombre),
+                            Filters.regex("descripcion", descripcion)
+                    ));
+                    cursor = result.cursor();
+                } else {
+                    // Si todos los campos tienen valores
+                    result = collection.find(Filters.and(
+                            Filters.regex("nombre", nombre),
+                            Filters.regex("descripcion", descripcion),
+                            Filters.regex("codigo", codigo)
+                    ));
+                    cursor = result.cursor();
+                }
+            }
+        }
+
+        while (cursor.hasNext()) {
+            Document document = cursor.next();
+            Producto indPro = new Producto();
+            indPro.setCodigo(document.getString("codigo"));
+            indPro.setNombre(document.getString("nombre"));
+            indPro.setDescripcion(document.getString("descripcion"));
+            indPro.setPrecio(document.getInteger("precio"));
+            indPro.setIva(document.getBoolean("iva"));
+            lista.add(indPro);
+
+        }
+        pro = lista.toArray(new Producto[0]);
+        return pro;
 
     }
 
-    public void cerrar() {
+    public Pedido[] obtenerPedidos() {
+        MongoCollection<Document> collection = db.getCollecProdu();
+        List<Pedido> lista = new ArrayList<Pedido>();
 
-        this.mongoClient.close();
+        Pedido[] pro = null;
+
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+
+                Pedido ind = new Pedido();
+                ind.setCodigo(document.getInteger("codigo"));
+                ind.setCliente(obtenerCliente(document.getInteger("cliente")));
+
+                Producto[] produc = new Producto[((String[]) document.get("productos")).length];
+                for (int i = 0; i < produc.length; i++) {
+                    produc[i] = obtenerProductos(((String[]) document.get("productos"))[i]);
+                }
+                ind.setProductos(produc);
+                ind.setFecha(document.getString("fecha"));
+                ind.setEstado(document.getString("estado"));
+                lista.add(ind);
+
+            }
+        }
+        pro = lista.toArray(new Pedido[0]);
+        return pro;
+    }
+
+    public Pedido obtenerPedido(Integer a) {
+        MongoCollection<Document> collection = db.getCollecClient();
+
+        Document query = new Document("codigo", a);
+        Document result = collection.find(query).first();
+
+        Document document = result;
+
+        Pedido ind = new Pedido();
+        ind.setCodigo(document.getInteger("codigo"));
+        ind.setCliente(obtenerCliente(document.getInteger("cliente")));
+
+        Producto[] produc = new Producto[((String[]) document.get("productos")).length];
+        for (int i = 0; i < produc.length; i++) {
+            produc[i] = obtenerProductos(((String[]) document.get("productos"))[i]);
+        }
+        ind.setProductos(produc);
+        ind.setFecha(document.getString("fecha"));
+        ind.setEstado(document.getString("estado"));
+
+        return ind;
+    }
+
+    public Cliente obtenerCliente(int ruc) {
+
+        MongoCollection<Document> collection = db.getCollecClient();
+
+        Document query = new Document("dni_ruc", ruc);
+        Document result = collection.find(query).first();
+
+        Document document = result;
+        Cliente ind = new Cliente();
+        ind.setDni_ruc(document.getInteger("dni_ruc"));
+        ind.setDirecion(document.getString("direcion"));
+        ind.setNombre(document.getString("nombre"));
+        ind.setEmail(document.getString("email"));
+        ind.setTelefono(document.getInteger("telefono"));
+
+        return ind;
     }
 }

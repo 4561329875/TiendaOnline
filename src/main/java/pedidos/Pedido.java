@@ -62,4 +62,8 @@ public class Pedido {
         this.estado = estado;
     }
 
+    public Pedido() {
+        
+    }
+    
 }

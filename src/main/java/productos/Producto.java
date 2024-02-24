@@ -9,8 +9,22 @@ package productos;
  * @author david
  */
 public class Producto {
-    
+
     private String codigo;
+    private String nombre;
+    private double precio;
+    private double precioVenta;
+    private boolean iva;
+
+    private String descripcion;
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
     public String getCodigo() {
         return codigo;
@@ -20,8 +34,6 @@ public class Producto {
         this.codigo = codigo;
     }
 
-    private String nombre;
-
     public String getNombre() {
         return nombre;
     }
@@ -30,29 +42,22 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    private double precio;
-
     public double getPrecio() {
         return precio;
     }
 
     public void setPrecio(double precio) {
         this.precio = precio;
+        this.precioVenta=precio*1.15;
     }
-
-        private double precioVenta;
 
     public double getPrecioVenta() {
         return precioVenta;
     }
 
-    public void setPrecioVenta(double precioVenta) {
-        this.precioVenta = precioVenta;
-    }
+   
 
-    private boolean iva;
-
-    public boolean isIva() {
+    public boolean getIva() {
         return iva;
     }
 

@@ -13,6 +13,10 @@ import pedidos.Pedido;
 public class Pago {
 
     private int codigo;
+    private Pedido pedido;
+    private Factura factura;
+    private String forma;
+    private String valorPagado;
 
     public int getCodigo() {
         return codigo;
@@ -22,8 +26,6 @@ public class Pago {
         this.codigo = codigo;
     }
 
-    private Pedido pedido;
-
     public Pedido getPedido() {
         return pedido;
     }
@@ -31,8 +33,6 @@ public class Pago {
     public void setPedido(Pedido pedido) {
         this.pedido = pedido;
     }
-
-    private Factura factura;
 
     public Factura getFactura() {
         return factura;
@@ -42,8 +42,6 @@ public class Pago {
         this.factura = factura;
     }
 
-    private String forma;
-
     public String getForma() {
         return forma;
     }
@@ -52,8 +50,6 @@ public class Pago {
         this.forma = forma;
     }
 
-    private String valorPagado;
-
     public String getValorPagado() {
         return valorPagado;
     }
@@ -61,5 +57,5 @@ public class Pago {
     public void setValorPagado(String valorPagado) {
         this.valorPagado = valorPagado;
     }
-    
+
 }
