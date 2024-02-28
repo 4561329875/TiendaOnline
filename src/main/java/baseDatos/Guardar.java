@@ -59,9 +59,14 @@ public class Guardar {
 
     public void guardar(Pedido pedido) {
         MongoCollection<Document> collection = db.getCollecPedi();
+        String[] pros=new String[pedido.getProductos().length];
+        for (int i = 0; i < pedido.getProductos().length; i++) {
+            pros[i]=pedido.getProductos()[i].getCodigo();
+        }
         Document document = new Document("codigo", pedido.getCodigo())
                 .append("cliente", pedido.getCliente().getDni_ruc())
-                .append("productos", pedido.getProductos())
+                
+                .append("productos", pros)
                 .append("fecha", pedido.getFecha())
                 .append("estado", pedido.getEstado());
         Document query = new Document("codigo", pedido.getCodigo());
