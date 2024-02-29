@@ -28,17 +28,19 @@ public class Guardar {
                 .append("descripcion", pro.getDescripcion())
                 .append("precio", pro.getPrecio())
                 .append("precioVenta", pro.getPrecioVenta())
-                .append("iva", pro.getIva());
+                .append("iva", pro.getIva())
+                .append("cantidad", pro.getCantidad());
         Document query = new Document("codigo", pro.getCodigo());
         Document result = collection.find(query).first();
         if (result != null) {
 
             collection.insertOne(document);
         } else {
-            collection.updateMany(result, document);
+            collection.updateOne(result, document);
         }
 
     }
+    
 
     public void guardar(Cliente cliente) {
         MongoCollection<Document> collection = db.getCollecClient();
@@ -52,8 +54,8 @@ public class Guardar {
         if (result == null) {
             collection.insertOne(document);
         } else {
-            Document filter = new Document("dni_ruc", cliente.getDni_ruc());
-            collection.updateOne(filter, new Document("$set", document));
+            
+            collection.updateOne(result, document);
         }
     }
 
@@ -74,16 +76,16 @@ public class Guardar {
         if (result == null) {
             collection.insertOne(document);
         } else {
-            Document filter = new Document("codigo", pedido.getCodigo());
-            collection.updateOne(filter, new Document("$set", document));
+            
+            collection.updateOne(result, document);
         }
     }
 
     public void guardar(Factura factura) {
         MongoCollection<Document> collection = db.getCollecFact();
         Document document = new Document("codigo", factura.getCodigo())
-                .append("pedido", factura.getPedido())
-                .append("subtotal", factura.getSubtotal())
+                .append("pedido", factura.getPedido().getCodigo())
+                .append("subtotal", factura.getSubTotal())
                 .append("total", factura.getTotal())
                 .append("estado", factura.getEstado());
         Document query = new Document("codigo", factura.getCodigo());
@@ -91,16 +93,15 @@ public class Guardar {
         if (result == null) {
             collection.insertOne(document);
         } else {
-            Document filter = new Document("codigo", factura.getCodigo());
-            collection.updateOne(filter, new Document("$set", document));
+            collection.updateOne(result, document);
         }
     }
 
     public void guardar(Pago pago) {
         MongoCollection<Document> collection = db.getCollecPag();
         Document document = new Document("codigo", pago.getCodigo())
-                .append("pedido", pago.getPedido())
-                .append("factura", pago.getFactura())
+                .append("pedido", pago.getPedido().getCodigo())
+                .append("factura", pago.getFactura().getCodigo())
                 .append("forma", pago.getForma())
                 .append("valorPagado", pago.getValorPagado());
         Document query = new Document("codigo", pago.getCodigo());
@@ -108,15 +109,14 @@ public class Guardar {
         if (result == null) {
             collection.insertOne(document);
         } else {
-            Document filter = new Document("codigo", pago.getCodigo());
-            collection.updateOne(filter, new Document("$set", document));
+            collection.updateOne(result, document);
         }
     }
 
     public void guardar(Envio envio) {
         MongoCollection<Document> collection = db.getCollecEnvi();
         Document document = new Document("codigo", envio.getCodigo())
-                .append("pedido", envio.getPedido())
+                .append("pedido", envio.getPedido().getCodigo())
                 .append("fechaSalida", envio.getFechaSalida())
                 .append("fechaEntrega", envio.getFechaEntrega())
                 .append("direcion", envio.getDirecion())
@@ -127,8 +127,12 @@ public class Guardar {
         if (result == null) {
             collection.insertOne(document);
         } else {
-            Document filter = new Document("codigo", envio.getCodigo());
-            collection.updateOne(filter, new Document("$set", document));
+           collection.updateOne(result, document);
         }
+    }
+    public void eliminarPro(Producto pro) {
+        MongoCollection<Document> collection = db.getCollecProdu();
+        Document filtro = new Document("codigo", pro.getCodigo());
+        collection.deleteOne(filtro);
     }
 }

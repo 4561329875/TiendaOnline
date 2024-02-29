@@ -8,6 +8,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
+import envios.Envio;
+import facturacion.Factura;
 import java.util.ArrayList;
 import java.util.List;
 import org.bson.Document;
@@ -36,8 +38,9 @@ public class Listar {
                 indPro.setCodigo(document.getString("codigo"));
                 indPro.setNombre(document.getString("nombre"));
                 indPro.setDescripcion(document.getString("descripcion"));
-                indPro.setPrecio(document.getInteger("precio"));
+                indPro.setPrecio(document.getDouble("precio"));
                 indPro.setIva(document.getBoolean("iva"));
+                indPro.setCantidad(document.getDouble("cantidad"));
                 lista.add(indPro);
 
             }
@@ -215,5 +218,54 @@ public class Listar {
 
         return ind;
     }
+    public Factura obteneFacturaPed(int i){
+        MongoCollection<Document> collection = db.getCollecFact();
+
+        Document query = new Document("pedido", i);
+        Document result = collection.find(query).first();
+
+        Document document = result;
+        Factura fac = new Factura(obtenerPedido(i));
+        fac.setCodigo(document.getInteger("codigo"));
+        fac.setEstado(document.getString("estado"));
+        return fac;
+    }
+    public Factura obteneFacturaCod(int i){
+        MongoCollection<Document> collection = db.getCollecFact();
+
+        Document query = new Document("codigo", i);
+        Document result = collection.find(query).first();
+
+        Document document = result;
+        Factura fac = new Factura(obtenerPedido(i));
+        fac.setCodigo(document.getInteger("codigo"));
+        fac.setEstado(document.getString("estado"));
+        return fac;
+    }
+    public Envio[] obteEnvios(){
+        MongoCollection<Document> collection = db.getCollecEnvi();
+        List<Envio> lista = new ArrayList<Envio>();
+
+        Envio[] pro = null;
+
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                Document document = cursor.next();
+
+                Envio ind = new Envio();
+                ind.setCodigo(document.getInteger("codigo"));
+                ind.setPedido(obtenerPedido(document.getInteger("pedido")));
+                ind.setFechaSalida(document.getString("fechaSalida"));
+                ind.setFechaEntrega(document.getString("fechaEntrega"));
+                ind.setDirecion(document.getString("direcion"));
+                ind.setDistancia(document.getDouble("distancia"));
+                ind.setTiempo(document.getString("tiempo"));
+                lista.add(ind);
+
+            }
+        }
+        pro = lista.toArray(new Envio[0]);
+        return pro;
     
+    }
 }

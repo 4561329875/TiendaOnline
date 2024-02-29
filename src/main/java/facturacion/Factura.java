@@ -5,6 +5,7 @@
 package facturacion;
 
 import pedidos.Pedido;
+import productos.Producto;
 
 /**
  *
@@ -12,13 +13,13 @@ import pedidos.Pedido;
  */
 public class Factura {
     
-    private String codigo;
+    private int codigo;
 
-    public String getCodigo() {
+    public int getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
+    public void setCodigo(int codigo) {
         this.codigo = codigo;
     }
 
@@ -28,30 +29,20 @@ public class Factura {
         return pedido;
     }
 
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
+        private double subTotal;
+
+    public double getSubTotal() {
+        return subTotal;
     }
 
-    private float subtotal;
 
-    public float getSubtotal() {
-        return subtotal;
-    }
+        private double total;
 
-    public void setSubtotal(float subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    private float total;
-
-    public float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(float total) {
-        this.total = total;
-    }
-
+   
     private String estado;
 
     public String getEstado() {
@@ -64,6 +55,17 @@ public class Factura {
 
     public Factura(Pedido pedido) {
         this.pedido = pedido;
+        double subtot=0;
+        double tot=0;
+        for (Producto pro : pedido.getProductos()) {
+            subtot+=pro.getPrecioVenta();
+            if (pro.getIva()) {
+                tot+=pro.getPrecioVenta()*1.12;
+            } else {
+                tot+=pro.getPrecioVenta();
+            }
+        }
+        
     }
     
 }
