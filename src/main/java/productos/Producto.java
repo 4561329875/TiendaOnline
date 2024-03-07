@@ -15,7 +15,7 @@ public class Producto {
     private double precio;
     private double precioVenta;
     private boolean iva;
-    
+    private String descripcion;
         private double cantidad;
 
     public double getCantidad() {
@@ -27,7 +27,7 @@ public class Producto {
     }
 
 
-    private String descripcion;
+    
 
     public String getDescripcion() {
         return descripcion;

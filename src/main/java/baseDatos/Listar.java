@@ -25,6 +25,10 @@ public class Listar {
 
     private DB db;
 
+    public Listar(DB db) {
+        this.db = db;
+    }
+
     public Producto[] obtenerProductos() {
         MongoCollection<Document> collection = db.getCollecProdu();
         List<Producto> lista = new ArrayList<Producto>();
@@ -166,6 +170,7 @@ public class Listar {
                 Producto[] produc = new Producto[((String[]) document.get("productos")).length];
                 for (int i = 0; i < produc.length; i++) {
                     produc[i] = obtenerProductos(((String[]) document.get("productos"))[i]);
+                    produc[i].setCantidad(((double[]) document.get("cantidad"))[i]);
                 }
                 ind.setProductos(produc);
                 ind.setFecha(document.getString("fecha"));

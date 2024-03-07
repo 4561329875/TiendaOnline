@@ -58,11 +58,11 @@ public class Factura {
         double subtot=0;
         double tot=0;
         for (Producto pro : pedido.getProductos()) {
-            subtot+=pro.getPrecioVenta();
+            subtot+=pro.getPrecioVenta()*pro.getCantidad();
             if (pro.getIva()) {
-                tot+=pro.getPrecioVenta()*1.12;
+                tot+=pro.getPrecioVenta()*1.12*pro.getCantidad();
             } else {
-                tot+=pro.getPrecioVenta();
+                tot+=pro.getPrecioVenta()*pro.getCantidad();
             }
         }
         

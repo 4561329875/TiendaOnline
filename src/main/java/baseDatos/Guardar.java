@@ -21,6 +21,10 @@ public class Guardar {
 
     private DB db;
 
+    public Guardar(DB db) {
+        this.db = db;
+    }
+
     public void guardar(Producto pro) {
         MongoCollection<Document> collection = db.getCollecProdu();
         Document document = new Document("codigo", pro.getCodigo())
@@ -32,7 +36,7 @@ public class Guardar {
                 .append("cantidad", pro.getCantidad());
         Document query = new Document("codigo", pro.getCodigo());
         Document result = collection.find(query).first();
-        if (result != null) {
+        if (result == null) {
 
             collection.insertOne(document);
         } else {
@@ -65,10 +69,15 @@ public class Guardar {
         for (int i = 0; i < pedido.getProductos().length; i++) {
             pros[i]=pedido.getProductos()[i].getCodigo();
         }
+        double[] cants=new double[pedido.getProductos().length];
+        for (int i = 0; i < pedido.getProductos().length; i++) {
+            cants[i]=pedido.getProductos()[i].getCantidad();
+        }
         Document document = new Document("codigo", pedido.getCodigo())
                 .append("cliente", pedido.getCliente().getDni_ruc())
                 
                 .append("productos", pros)
+                .append("cantidad", cants)
                 .append("fecha", pedido.getFecha())
                 .append("estado", pedido.getEstado());
         Document query = new Document("codigo", pedido.getCodigo());
